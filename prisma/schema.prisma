@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum State {
+  APPROVED
+  PENDING
+  DECLINED
+}
+
+model User {
+  id         String      @id @default(uuid())
+  email      String      @unique
+  firstName  String      @map("first_name")
+  middleName String?     @map("middle_name")
+  lastName   String      @map("last_name")
+  password   String
+  state      State       @default(PENDING)
+  roles      UserRole[]
+  student    Student?
+  respondent Respondent?
+
+  @@map("users")
+}
+
+enum RoleName {
+  USER
+  STUDENT
+  RESPONDENT
+  ADMIN
+}
+
+model UserRole {
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, userId])
+  @@map("user_roles")
+}
+
+model Role {
+  id          String       @id @default(uuid())
+  name        RoleName
+  permissions Permission[]
+  users       UserRole[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id     String @id @default(uuid())
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  body   String
+
+  @@map("permissions")
+}
+
+model Student {
+  userId     String             @unique @map("user_id")
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group      String?
+  faculty    String?
+  department String?
+  petitions  Petition[]
+  signatures StudentSignature[]
+
+  @@map("students")
+}
+
+model StudentSignature {
+  studentId  String   @map("student_id")
+  student    Student  @relation(fields: [studentId], references: [userId], onDelete: Cascade)
+  petitionId Int      @map("petition_id")
+  petition   Petition @relation(fields: [petitionId], references: [id], onDelete: Cascade)
+  date       DateTime @default(now())
+
+  @@id([studentId, petitionId])
+  @@map("student_signatures")
+}
+
+enum PetitionStatus {
+  SIGNING
+  PENDING
+  RESPOND
+}
+
+model Petition {
+  id         Int                @id @default(autoincrement())
+  title      String
+  text       String
+  keywords   String?
+  status     PetitionStatus     @default(SIGNING)
+  authorId   String             @map("author_id")
+  author     Student            @relation(fields: [authorId], references: [userId], onDelete: Cascade)
+  response   Response?
+  signatures StudentSignature[]
+
+  @@map("petitions")
+}
+
+model Respondent {
+  userId    String     @unique @map("user_id")
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position  String?
+  responses Response[]
+
+  @@map("respondents")
+}
+
+model Response {
+  petitionId   Int        @unique @map("petition_id")
+  petition     Petition   @relation(fields: [petitionId], references: [id], onDelete: Cascade)
+  respondentId String     @map("respondent_id")
+  respondent   Respondent @relation(fields: [respondentId], references: [userId], onDelete: Cascade)
+  text         String
+  date         DateTime
+
+  @@map("responses")
+}
