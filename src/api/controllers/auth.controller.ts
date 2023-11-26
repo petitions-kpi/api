@@ -1,0 +1,45 @@
+import { Body, Controller, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { AuthDto } from '../dto/auth.dto';
+import { AuthService } from '../services/auth.service';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { LocalAuthGuard } from '../../guards/local-auth.guard';
+
+@Controller({
+  version: '1',
+  path: '/auth',
+})
+export class AuthController {
+  constructor (
+    private authService: AuthService,
+  ) {}
+
+  @Post('/register')
+  async register (
+    @Body() body: AuthDto,
+  ) {
+    return this.authService.register(body);
+  }
+
+  @Post('/verify/:token')
+  async verify (
+    @Param('token') token: string,
+  ) {
+    return await this.authService.verify(token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/refresh')
+  async refresh (
+    @Req() req,
+  ) {
+    return this.authService.getTokens(req.user);
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('/login')
+  async login (
+    @Req() req,
+  ) {
+    return await this.authService.login(req.user);
+  }
+}
