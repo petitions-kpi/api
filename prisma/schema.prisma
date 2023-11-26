@@ -25,6 +25,7 @@ model User {
   password   String
   state      State       @default(PENDING)
   roles      UserRole[]
+  mailToken  MailToken?
   student    Student?
   respondent Respondent?
 
@@ -127,4 +128,13 @@ model Response {
   date         DateTime
 
   @@map("responses")
+}
+
+model MailToken {
+  value     String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("mail_tokens")
 }
