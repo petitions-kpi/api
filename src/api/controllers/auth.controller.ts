@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthDto } from '../dto/auth.dto';
 import { AuthService } from '../services/auth.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -24,7 +24,7 @@ export class AuthController {
   async verify (
     @Param('token') token: string,
   ) {
-    return await this.authService.verify(token);
+    return this.authService.verify(token);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -40,6 +40,14 @@ export class AuthController {
   async login (
     @Req() req,
   ) {
-    return await this.authService.login(req.user);
+    return this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/me')
+  async getUser (
+    @Req() req,
+  ) {
+    return this.authService.getUser(req.user);
   }
 }
