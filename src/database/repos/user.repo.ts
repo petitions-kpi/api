@@ -8,13 +8,25 @@ export class UserRepo {
     private prisma: PrismaService,
   ) {}
 
-  private include: Prisma.UserInclude = {
+  private include = {
     mailToken: true,
+    roles: {
+      include: {
+        role: true,
+      },
+    },
   };
   
   async find (where: Prisma.UserWhereInput) {
     return this.prisma.user.findFirst({
       where,
+      include: this.include,
+    });
+  }
+
+  findById (id: string) {
+    return this.prisma.user.findFirst({
+      where: { id },
       include: this.include,
     });
   }

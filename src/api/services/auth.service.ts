@@ -6,15 +6,17 @@ import * as bcrypt from 'bcrypt';
 import { MailService } from './mail.service';
 import * as process from 'process';
 import { EntityNotFoundException } from '../../utils/exceptions/entity-not-found.exception';
-import { State, User } from '@prisma/client';
+import { RoleName, State, User } from '@prisma/client';
 import { TokenHasExpiredException } from '../../utils/exceptions/token-has-expired.exception';
 import { JwtService } from '@nestjs/jwt';
 import { HOUR } from '../../utils/constants';
+import { RoleRepo } from '../../database/repos/role.repo';
 
 @Injectable()
 export class AuthService {
   constructor (
     private userRepo: UserRepo,
+    private roleRepo: RoleRepo,
     private mailService: MailService,
     private jwtService: JwtService,
   ) {}
@@ -67,10 +69,23 @@ export class AuthService {
       throw new TokenHasExpiredException();
     }
 
+    const roles = await this.roleRepo.findMany({
+      where: {
+        name: {
+          in: [RoleName.USER, RoleName.STUDENT],
+        },
+      },
+    });
+
     await this.userRepo.updateById(user.id, {
       state: State.APPROVED,
       mailToken: {
         delete: {},
+      },
+      roles: {
+        createMany: {
+          data: roles.map(({ id }) => ({ roleId: id })),
+        },
       },
     });
 
@@ -95,5 +110,13 @@ export class AuthService {
   async hashPassword (password: string): Promise<string> {
     const salt = 7;
     return bcrypt.hash(password, salt);
+  }
+
+  async getUser (user: User) {
+    const { roles } = await this.userRepo.findById(user.id);
+    return {
+      ...user,
+      roles: roles.map(({ role }) => role.name),
+    };
   }
 }
