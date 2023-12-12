@@ -4,6 +4,7 @@ import {
   CreatePermissionDto,
   CreatePermissionsDto,
 } from '../dto/create-permission.dto';
+import { RoleByIdPipe } from '../pipes/role-by-id.pipe';
 
 @Controller({
   version: '1',
@@ -15,7 +16,7 @@ export class RoleController {
   @Post(':roleId/permission')
   async createPermission (
     @Body() body: CreatePermissionDto,
-    @Param('roleId') roleId: string,
+    @Param('roleId', RoleByIdPipe) roleId: string,
   ) {
     return await this.roleService.createPermission(roleId, body);
   }
@@ -23,13 +24,13 @@ export class RoleController {
   @Post(':roleId/permissions')
   async createPermissions (
     @Body() body: CreatePermissionsDto,
-    @Param('roleId') roleId: string,
+    @Param('roleId', RoleByIdPipe) roleId: string,
   ) {
     return await this.roleService.createPermissions(roleId, body.permissions);
   }
 
   @Get(':roleId')
-  async getRolePermissions (@Param('roleId') roleId: string) {
+  async getRolePermissions (@Param('roleId', RoleByIdPipe) roleId: string) {
     return await this.roleService.getRolePermissions(roleId);
   }
 }
