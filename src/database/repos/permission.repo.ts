@@ -17,4 +17,16 @@ export class PermissionRepo {
       data,
     });
   }
+
+  async findById (id: string) {
+    return this.prisma.permission.findFirst({
+      where: { id },
+    });
+  }
+
+  async deleteById (id: string) {
+    return this.prisma.permission.delete({
+      where: { id },
+    });
+  }
 }
