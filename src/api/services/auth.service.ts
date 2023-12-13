@@ -87,6 +87,9 @@ export class AuthService {
           data: roles.map(({ id }) => ({ roleId: id })),
         },
       },
+      student: {
+        create: {},
+      },
     });
 
     return this.getTokens(user);

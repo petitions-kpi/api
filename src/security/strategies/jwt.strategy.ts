@@ -3,8 +3,8 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import * as process from 'process';
 import { JwtPayloadDto } from '../../api/dto/jwt-payload.dto';
 import { PrismaService } from '../../database/prisma.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { State, User } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -26,6 +26,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!user) throw new UnauthorizedException();
+
+    if (user.state !== State.APPROVED) throw new ForbiddenException();
 
     delete user.password;
 
