@@ -106,6 +106,7 @@ model Petition {
   author     Student            @relation(fields: [authorId], references: [userId], onDelete: Cascade)
   response   Response?
   signatures StudentSignature[]
+  createdAt  DateTime           @default(now()) @map("created_at")
 
   @@map("petitions")
 }
