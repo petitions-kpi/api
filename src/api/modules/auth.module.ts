@@ -7,6 +7,7 @@ import * as process from 'process';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from '../../security/strategies/jwt.strategy';
 import { LocalStrategy } from '../../security/strategies/local.strategy';
+import { AccessModule } from './access.module';
 
 @Module({
   providers: [AuthService, JwtStrategy, LocalStrategy],
@@ -14,6 +15,7 @@ import { LocalStrategy } from '../../security/strategies/local.strategy';
   imports: [
     MailModule,
     PassportModule,
+    AccessModule,
     JwtModule.register({
       global: true,
       secret: process.env.SECRET,
