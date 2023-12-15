@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './api/modules/auth.module';
 import { MailModule } from './api/modules/mail.module';
 import { PrismaModule } from './database/prisma.module';
+import { AccessModule } from './api/modules/access.module';
 import { PetitionModule } from './api/modules/petition.module';
 
 @Module({
@@ -9,6 +10,7 @@ import { PetitionModule } from './api/modules/petition.module';
     AuthModule,
     MailModule,
     PrismaModule,
+    AccessModule,
     PetitionModule,
   ],
 })

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { PetitionService } from '../services/petition.service';
 import { PetitionMapper } from '../mappers/petition.mapper';
-import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../security/guards/jwt-auth.guard';
 import { CreatePetitionDto } from '../dto/create-petition.dto';
 
 @Controller({

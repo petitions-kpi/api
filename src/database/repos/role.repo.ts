@@ -18,4 +18,13 @@ export class RoleRepo {
       include: this.include,
     });
   }
+
+  async findById (id: string) {
+    return this.prisma.role.findFirst({
+      where: {
+        id,
+      },
+      include: this.include,
+    });
+  }
 }
