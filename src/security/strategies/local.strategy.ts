@@ -20,7 +20,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
     if (!user) throw new EntityNotFoundException('User');
 
-    const isMatch = bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new UnauthorizedException('Password is wrong');
 
     delete user.password;
